@@ -17,27 +17,49 @@ package de.qreator;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
+import java.io.File;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
+import org.vertx.java.core.http.HttpServer;
+import org.vertx.java.core.json.JsonArray;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
 /*
-This is a simple Java verticle which receives `ping` messages on the event bus and sends back `pong` replies
+ This is a simple Java verticle which receives `ping` messages on the event bus and sends back `pong` replies
  */
 public class PingVerticle extends Verticle {
 
-  public void start() {
+    @Override
+    public void start() {
 
+        HttpServer server = vertx.createHttpServer();
+        server.requestHandler(req -> {
+            String file = req.path().equals("/") ? "index.html" : req.path();
+            File f = new File("src/main/resources/web" + file);
+            req.response().sendFile(f.getAbsolutePath());
+        });
 
-    vertx.eventBus().registerHandler("ping-address", new Handler<Message<String>>() {
-      @Override
-      public void handle(Message<String> message) {
-        message.reply("pong!");
-        container.logger().info("Sent back pong");
-      }
-    });
+        JsonObject config = new JsonObject().putString("prefix", "/bridge");
 
-    container.logger().info("PingVerticle started");
+        JsonArray inboundPermitted = new JsonArray();
+        JsonObject inboundPermitted1 = new JsonObject().putString("address", "scrabble.alle");
+        inboundPermitted.add(inboundPermitted1);
+        JsonObject inboundPermitted2 = new JsonObject().putString("address", "scrabble.spielfeld");
+        inboundPermitted.add(inboundPermitted2);
+        JsonObject inboundPermitted3 = new JsonObject().putString("address_re", "scrabble.spieler\\..+");
+        inboundPermitted.add(inboundPermitted3);
 
-  }
+        JsonArray outboundPermitted = new JsonArray();
+        JsonObject outboundPermitted1 = new JsonObject().putString("address", "scrabble.alle");
+        outboundPermitted.add(outboundPermitted1);
+        JsonObject outboundPermitted2 = new JsonObject().putString("address", "scrabble.spielfeld");
+        outboundPermitted.add(outboundPermitted2);
+        JsonObject outboundPermitted3 = new JsonObject().putString("address_re", "scrabble.spieler\\..+");
+        outboundPermitted.add(outboundPermitted3);
+
+        vertx.createSockJSServer(server).bridge(config, inboundPermitted, outboundPermitted);
+
+        server.listen(8080);
+    }
 }
