@@ -20,7 +20,6 @@ $(document).ready(function(){
     var buchstaben=[];
     var buchstabenwerte=[];
     
-    
     function Buchstabe(bs,wert){
         this.bs=bs;
         this.wert=wert;
@@ -115,11 +114,7 @@ $(document).ready(function(){
             }
         }
         //$("#bisherigeIdeen").html(text);
-        var alle=false;
-       if (belegt.length===aktuelleBuchstaben.length){
-           alle=true;
-       }
-        eb.send("scrabble.spielfeld",{typ:"vorschlag",wort:text,nr:uuid,alle:alle});
+        eb.send("scrabble.spielfeld",{typ:"vorschlag",wort:text,nr:uuid});
         
             $("#bistdran").hide();
         

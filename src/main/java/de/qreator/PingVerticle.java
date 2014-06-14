@@ -36,8 +36,7 @@ public class PingVerticle extends Verticle {
         HttpServer server = vertx.createHttpServer();
         server.requestHandler(req -> {
             String file = req.path().equals("/") ? "index.html" : req.path();
-            File f = new File("src/main/resources/web" + file);
-            req.response().sendFile(f.getAbsolutePath());
+            req.response().sendFile("./web/"+file);
         });
 
         JsonObject config = new JsonObject().putString("prefix", "/bridge");

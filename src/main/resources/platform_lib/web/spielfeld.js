@@ -11,9 +11,8 @@ $(document).ready(function() {
     var jastimmen = 0;
     var neinstimmen = 0;
     var zug=0;
-    var alle=false; // ob der aktuelle spieler alle steine benutzt hat (dann 50 punkte zusätzlich)
     var tempfeld = []; // feld zur überprüfung der summe
-    var farben = ["#ffffff", "#ffaaaa", "#A9E2F3", "#58ACFA", "#ffff00", "#FF8000"];
+    var farben = ["#ffffff", "#ffaaaa", "#aaaaff", "#0000ff", "#ffff00", "#ff0000"];
     scrabblefeld[0] = "500200050002005";
     scrabblefeld[1] = "040003000300040";
     scrabblefeld[2] = "004000202000400";
@@ -37,7 +36,7 @@ $(document).ready(function() {
     var fb = breite / 15; // feldbreite
     var schriftgroesse = fb / 2;
     $("body").html("");
-    $("body").append("<table><tr><td><canvas id='bild' width='" + breite + "px' height='" + breite + "px'/></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Als Spieler bitte anmelden unter <b>http://"+window.location.host+"/spieler.html</b></div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div></div></td></tr></table>");
+    $("body").append("<table><tr><td><canvas id='bild' width='" + breite + "px' height='" + breite + "px'/></td><td><div class='farbig'> <div class='aktuell' id='aktuell'/><div class='punkte' id='punkte'/><div class='info' id='nachricht'/></div></td></tr></table>");
    
     //$("body").append("<div class='aktuell' id='aktuell'/><div class='punkte' id='punkte'/><div class='info' id='nachricht'/>");
     c = $("#bild")[0].getContext("2d");
@@ -60,7 +59,6 @@ $(document).ready(function() {
                 var adresse = "scrabble.spieler." + uuid;
                 eb.send(adresse, {typ: "nr", wert: "" + spielernummer});
                 eb.publish("scrabble.alle", {typ: "anmeldung", wert: "" + spielernummer});
-                $("#nachricht").html("Anzahl der angemeldeten Spieler: "+spieler.length);
             } else if (typ === "spielnr" && anmeldung === false) {
                 var uuid = message.nr;
                 var adresse = "scrabble.spieler." + uuid;
@@ -71,7 +69,6 @@ $(document).ready(function() {
             } else if (typ === "vorschlag") {
                 var uuid = message.nr;
                 var wort = message.wort;
-                alle=message.alle;
                 gedreht=false;
                 for (var i = 0; i < spieler.length; i++) {
                     if (spieler[i] === uuid && i === geradedran) {
@@ -155,17 +152,13 @@ $(document).ready(function() {
                 }
             } else if (typ==="passen"){
                 replier("OK");
-                var feld2=[];
-                eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistnichtdran", wert: feld2});
-                var nachrichtentext="Spieler "+(geradedran + 1)+" hat gepasst!<p>";
-                
+                eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistnichtdran", wert: feld});
                 geradedran = (geradedran + 1) % spieler.length;
             eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
 
             eb.send("scrabble.alle", {typ: "weiter"});
             
             renderFeld();
-            $("#nachricht").html(nachrichtentext+"Spieler "+(geradedran+1)+" ist am Zug!");
             } else if (typ==="tausch"){
                 var text=message.wert;
                 for (var i=0;i<text.length;i++){ // erst buchstaben zurück in topf
@@ -181,23 +174,22 @@ $(document).ready(function() {
                 
                 
                  var bs = zieheBuchstaben(text.length);
-            var feld2 = [];
+            var feld = [];
             if (bs.length > 0) {
                 for (var j = 0; j < bs.length; j++) {
-                    feld2.push(buchstaben[bs[j]]); // den entsprechenden buchstaben dazu
-                    feld2.push(buchstabenwerte[bs[j]]);
+                    feld.push(buchstaben[bs[j]]); // den entsprechenden buchstaben dazu
+                    feld.push(buchstabenwerte[bs[j]]);
                 }
             }
-            eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistnichtdran", wert: feld2});
-            var nachrichtentext="Spieler "+(geradedran + 1)+" hat Buchstaben getauscht!<p>";
-            //$("#nachricht").html("Spieler "+(geradedran + 1)+" hat Buchstaben getauscht!");
+            eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistnichtdran", wert: feld});
+
             geradedran = (geradedran + 1) % spieler.length;
             eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
 
             eb.send("scrabble.alle", {typ: "weiter"});
             //zug++;
-            renderFeld();
-                $("#nachricht").html(nachrichtentext+"Spieler "+(geradedran+1)+" ist am Zug!");
+            //renderFeld();
+                
                 //replier(b);
             }
         });
@@ -206,17 +198,10 @@ $(document).ready(function() {
             var x = aktuellesX;
             var y = aktuellesY;
             var zaehler = 0;
-            
             punkte[geradedran] += aktuellesDelta;
-            if (alle===true){
-                punkte[geradedran]+=50;
-            }
             for (var i = 0; i < aktuelleswort.length; i++) {
                 if (aktuelleswort[i] !== "?") {
                     belegung[y * 15 + x] = aktuelleswort[i];
-                    if (feld[y*15+x]>0){
-                        feld[y*15+x]*=-1; // prämienpunkte annulieren
-                    }
                     zaehler++;
                 }
                 if (gedreht === true) {
@@ -226,28 +211,23 @@ $(document).ready(function() {
                     x++;
                 }
             }
-            //renderFeld();
+            renderFeld();
             var bs = zieheBuchstaben(zaehler);
-            var feld2 = [];
+            var feld = [];
             if (bs.length > 0) {
                 for (var j = 0; j < bs.length; j++) {
-                    feld2.push(buchstaben[bs[j]]); // den entsprechenden buchstaben dazu
-                    feld2.push(buchstabenwerte[bs[j]]);
+                    feld.push(buchstaben[bs[j]]); // den entsprechenden buchstaben dazu
+                    feld.push(buchstabenwerte[bs[j]]);
                 }
             }
-            eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistnichtdran", wert: feld2});
-            var allegeschafft="";
-            if (alle===true){
-                allegeschafft="Spieler "+(geradedran+1)+" hat alle Steine abgelegt! 50 Punkte Bonus!<p>";
-            }
+            eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistnichtdran", wert: feld});
+
             geradedran = (geradedran + 1) % spieler.length;
             eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
 
             eb.send("scrabble.alle", {typ: "weiter"});
             zug++;
             renderFeld();
-            
-            $("#nachricht").html(allegeschafft+"Spieler "+(geradedran+1)+" ist am Zug!");
         }
 
         function kontrolliereAktuellesWort() { //überprüft das aktuelle wort und gibt bei richtiger lage die punkte an
@@ -439,18 +419,11 @@ $(document).ready(function() {
             for (var i = 0; i < aktuelleswort.length; i++) {
                 c.font = "bold " + schriftgroesse + "px Arial";
                 c.textAlign = "center";
-                c.fillStyle = "#ff0000";
+                c.fillStyle = "#008800";
                 var text = "" + aktuelleswort[i];
                 if (text !== "?") {
-                    c.fillStyle="#008800";
-                    if (belegung[yzaehler*15+xzaehler]!==" "){
-                        c.fillStyle="#ff0000";
-                    }
-                    
-                    c.fillRect(x  + 2, y + 2, fb - 4, fb - 4);
-                    c.fillStyle="#ffffff";
                     c.fillText(text, x + 4 + (fb - 8) / 2, y + schriftgroesse * 1.3);
-                } 
+                }
                 if (gedreht === true) {
                     y += fb;
                     yzaehler++;
@@ -481,12 +454,9 @@ $(document).ready(function() {
                     aktuellesDelta = summe; // zum punkte zählen
                     // nachricht an alle schicken
                     eb.send("scrabble.spieler." + spieler[geradedran], {typ: "ok_da"});
-                    
                 } else {
                     $("#nachricht").html("Wort so nicht in Ordnung: " + ok[0]);
                     eb.send("scrabble.spieler." + spieler[geradedran], {typ: "ok_weg"});
-                   
-                    
                 }
             }
         }
@@ -556,7 +526,7 @@ $(document).ready(function() {
                 c.stroke();
             }
             for (var i = 0; i < feld.length; i++) {
-                c.fillStyle = farben[Math.abs(feld[i])];
+                c.fillStyle = farben[feld[i]];
                 c.fillRect(i % 15 * fb + 2, parseInt(i / 15) * fb + 2, fb - 4, fb - 4);
             }
             for (var i = 0; i < belegung.length; i++) {
@@ -567,7 +537,6 @@ $(document).ready(function() {
                 if (text !== "?") {
                     c.fillText(text, (i % 15) * fb + 4 + (fb - 8) / 2, parseInt(i / 15) * fb + schriftgroesse * 1.3);
                 }
-                
             }
             $("#aktuell").html("Aktueller Spieler: " + (geradedran + 1));
             $("#punkte").html("");
@@ -584,14 +553,14 @@ $(document).ready(function() {
             for (var i = 0; i < spieler.length; i++) { // buchstaben austeilen
                 punkte[i] = 0; // punkte zurücksetzen
                 var bs = zieheBuchstaben(7);
-                var feld2 = [];
+                var feld = [];
                 if (bs.length > 0) {
                     for (var j = 0; j < bs.length; j++) {
-                        feld2.push(buchstaben[bs[j]]); // den entsprechenden buchstaben dazu
-                        feld2.push(buchstabenwerte[bs[j]]);
+                        feld.push(buchstaben[bs[j]]); // den entsprechenden buchstaben dazu
+                        feld.push(buchstabenwerte[bs[j]]);
                     }
                 }
-                eb.send("scrabble.spieler." + spieler[i], {typ: "buchstaben", wert: feld2, bs: buchstaben, werte: buchstabenwerte});
+                eb.send("scrabble.spieler." + spieler[i], {typ: "buchstaben", wert: feld, bs: buchstaben, werte: buchstabenwerte});
             }
             // jetzt zufälligen spieler starten lassen
             var zufall = parseInt(Math.random() * spieler.length);
@@ -599,7 +568,6 @@ $(document).ready(function() {
             eb.send("scrabble.spieler." + spieler[zufall], {typ: "bistdran"});
             initialisiereFeld();
             renderFeld();
-            $("#nachricht").html("Los geht's!<p>Es beginnt Spieler "+(geradedran+1));
         }
     };
 
