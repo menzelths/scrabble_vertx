@@ -37,7 +37,7 @@ $(document).ready(function() {
     var fb = breite / 15; // feldbreite
     var schriftgroesse = fb / 2;
     $("body").html("");
-    $("body").append("<table><tr><td><canvas id='bild' width='" + breite + "px' height='" + breite + "px'/></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Als Spieler bitte anmelden unter <b>http://"+window.location.host+"/spieler.html</b></div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div></div></td></tr></table>");
+    $("body").append("<table><tr><td><canvas id='bild' width='" + breite + "px' height='" + breite + "px'/></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Alle Spieler bitte anmelden!</div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div></div></td></tr></table>");
    
     //$("body").append("<div class='aktuell' id='aktuell'/><div class='punkte' id='punkte'/><div class='info' id='nachricht'/>");
     c = $("#bild")[0].getContext("2d");
@@ -447,7 +447,7 @@ $(document).ready(function() {
                         c.fillStyle="#ff0000";
                     }
                     
-                    c.fillRect(x  + 2, y + 2, fb - 4, fb - 4);
+                    c.fillRect(x  + 5, y + 5, fb - 10, fb - 10);
                     c.fillStyle="#ffffff";
                     c.fillText(text, x + 4 + (fb - 8) / 2, y + schriftgroesse * 1.3);
                 } 
@@ -483,7 +483,11 @@ $(document).ready(function() {
                     eb.send("scrabble.spieler." + spieler[geradedran], {typ: "ok_da"});
                     
                 } else {
+                    
                     $("#nachricht").html("Wort so nicht in Ordnung: " + ok[0]);
+                    if (zug===0){
+                        $("#nachricht").append("<p>Wort muss über das Startfeld in der Mitte gehen!");
+                    }
                     eb.send("scrabble.spieler." + spieler[geradedran], {typ: "ok_weg"});
                    
                     
