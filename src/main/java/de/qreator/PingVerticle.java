@@ -17,9 +17,9 @@ package de.qreator;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
-import java.io.File;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.eventbus.Message;
+
+import java.net.InetAddress;
+
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -60,5 +60,11 @@ public class PingVerticle extends Verticle {
         vertx.createSockJSServer(server).bridge(config, inboundPermitted, outboundPermitted);
 
         server.listen(8080);
+        try{
+        System.out.println("Spieler bitte mit Browser anmelden unter \nhttp://"+InetAddress.getLocalHost().getHostAddress()+":8080/spieler.html");
+        
+        } catch(Exception e){
+            e.printStackTrace();
+        }
     }
 }
