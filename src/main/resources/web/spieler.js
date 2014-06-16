@@ -19,6 +19,7 @@ $(document).ready(function(){
     var geradedran=false;
     var buchstaben=[];
     var buchstabenwerte=[];
+    var punkte=0;
     
     
     function Buchstabe(bs,wert){
@@ -28,7 +29,7 @@ $(document).ready(function(){
     
     function initialisiereSpielfeld(){
         $("body").html("Spieler Nummer "+spielernummer+"<br>");
-        
+        $("body").append("<div id=punktzahl/>");
         $("body").append("<canvas width='"+breite+"px' height='"+hoehe+"px' id='bild'/>");
         $("body").append("<div class='idee' id='aktuelleIdee'/><br>");
         
@@ -37,12 +38,14 @@ $(document).ready(function(){
         $("body").append("<div id='bisherigeIdeen' />");
         $("body").append("<div id='nachricht'></div>");
         $("body").append("<div id='navigation'></div>");
+       
         if (geradedran===true){
             $("#bistdran").show();
         } else {
             $("#bistdran").hide();
         }
         c=$("#bild")[0].getContext("2d");
+        
         $("#bild").mousedown(function(event) {
         event.preventDefault();
         var jetzt=new Date().getTime();
@@ -115,10 +118,12 @@ $(document).ready(function(){
             }
         }
         //$("#bisherigeIdeen").html(text);
+        
         var alle=false;
-       if (belegt.length===aktuelleBuchstaben.length){
+       if (belegt.length===aktuelleBuchstaben.length){ // falls alle steine auf einmal gelegt werden 
            alle=true;
        }
+       
         eb.send("scrabble.spielfeld",{typ:"vorschlag",wort:text,nr:uuid,alle:alle});
         
             $("#bistdran").hide();
@@ -127,6 +132,9 @@ $(document).ready(function(){
     $("#passen").click(function(){ // zug aussetzen
         eb.send("scrabble.spielfeld",{typ:"passen",nr:uuid},function(antwort){
         });
+        belegt=[];
+        aktuellewahl=[];
+        zeichneSpielfeld();
     });
     $("#tauschen").click(function(){
         var text="";
@@ -218,12 +226,15 @@ $(document).ready(function(){
             aktuelleBuchstaben=[];
             for (var i=0;i<sammel.length;i++){
             aktuelleBuchstaben[i]=sammel[i];
+            
         }
             var neu=message.wert;
             for (var i=0;i<neu.length;i+=2){
                 aktuelleBuchstaben.push(new Buchstabe(neu[i],neu[i+1]));
             
         }
+           
+        
             geradedran=false;
             belegt=[];
             zeichneSpielfeld();
@@ -274,7 +285,19 @@ $(document).ready(function(){
             $("#okwahl").show();
         } else if (typ==="ok_weg"){
             $("#okwahl").hide();
-        } 
+        } else if (typ==="ende"){
+            $("body").html("Spieler "+(spielernummer)+"!<p><div>Das Spiel ist beendet!</div><p><div><b>Du hast "+message.punkte+" Punkte erreicht!</b></div><p>");
+            if (message.sieger===false){
+                $("body").append("<div>Auf deinem Brett sind noch die folgenden Buchstaben und Werte:</div><p>");
+                var summe=0;
+                for (var i=0;i<aktuelleBuchstaben.length;i++){
+                    $("body").append(aktuelleBuchstaben[i].bs+" - "+aktuelleBuchstaben[i].wert+"<br>");
+                    summe+=aktuelleBuchstaben[i].wert;
+                }
+                $("body").append("<p><div>Gesamtpunkte auf deinem Brett:</div><p>"+summe);
+            }
+            
+        }
 
       });
       
@@ -286,6 +309,12 @@ $(document).ready(function(){
             $("body").html("Es geht gleich los ...");
         } else if (typ==="weiter"){
             zeichneSpielfeld();
+        } else if (typ==="spielende"){
+            var p=0;
+            for (var i=0;i<aktuelleBuchstaben.length;i++){
+                p+=aktuelleBuchstaben[i].wert;
+            }
+            eb.send("scrabble.spielfeld",{typ:"punkte",punkte:p,nr:uuid});
         }
       });
       

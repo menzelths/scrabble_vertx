@@ -47,14 +47,15 @@ table{
     margin: 20px;
     padding: 20px;
     border: 20px;
-    background-color: #ffaaaa;
-       
+    background-color: #A9E2F3;
+    font-family: "Arial";
 }
 
 .farbig2{
     margin: 20px;
     padding: 20px;
     border: 20px;
-    background-color: #aaffaa;
+    background-color: #ffff00;
+    font-family: "Arial";
        
 }
