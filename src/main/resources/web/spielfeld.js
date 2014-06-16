@@ -433,7 +433,7 @@ $(document).ready(function() {
             }
             
             var zaehler=0;
-            if (leerzaehler===0&&gesamtergebnis.length===2){ // dann schauen, ob neues wort größer als altes
+            if (leerzaehler===0&&gesamtergebnis.length===2&&gesamtergebnis[0].length===aktuelleswort.length){ // dann schauen, ob neues wort größer als altes
                 if (gedreht===false){
                     // hier schauen, ob links oder rechts noch etwas steht
                     if (aktuellesX-1>=0){
@@ -463,6 +463,9 @@ $(document).ready(function() {
             }
             }
             
+            if (gesamtergebnis.length===0){
+                buchstabensumme=0;
+            }
             
             if (zug === 0 && zaehlerzentrum === 0) {
                 buchstabensumme = 0;
