@@ -422,10 +422,52 @@ $(document).ready(function() {
                     }
                 }
 
+            
+            
+            // noch schnell die umgebung des wortes testen
+            var leerzaehler=0;
+            for (var i=0;i<aktuelleswort.length;i++){
+                if (aktuelleswort[i]==="?"){
+                    leerzaehler++;
+                }
             }
+            
+            var zaehler=0;
+            if (leerzaehler===0&&gesamtergebnis.length===2){ // dann schauen, ob neues wort größer als altes
+                if (gedreht===false){
+                    // hier schauen, ob links oder rechts noch etwas steht
+                    if (aktuellesX-1>=0){
+                        if (belegung[(aktuellesY*15+aktuellesX-1)]!==" "){
+                            zaehler++;
+                        }
+                    }
+                    if (aktuellesX+aktuelleswort.length<15){
+                        if (belegung[aktuellesY*15+aktuellesX+aktuelleswort.length]!==" ")
+                            zaehler++;
+                    }
+                } else {
+                    // hier schauen, ob oben oder unten noch etwas steht
+                    if (aktuellesY-1>=0){
+                        if (belegung[(aktuellesY-1)*15+aktuellesX]!==" "){
+                            zaehler++;
+                        }
+                    }
+                    if (aktuellesY+aktuelleswort.length<15){
+                        if (belegung[(aktuellesY+aktuelleswort.length)*15+aktuellesX]!==" "){
+                            zaehler++;
+                        }
+                    }
+                }
+                if (zug>0&& zaehler===0){
+                buchstabensumme=0;
+            }
+            }
+            
+            
             if (zug === 0 && zaehlerzentrum === 0) {
                 buchstabensumme = 0;
             }
+        }
             return [wort, buchstabensumme, gesamtergebnis];
         }
 
@@ -609,7 +651,7 @@ $(document).ready(function() {
         function initialisiereFeld() { // startbelegung
             feld = [];
             belegung = [];
-            oben = 5; // nur zum test
+            //oben = 5; // nur zum test
             for (var i = 0; i < scrabblefeld.length; i++) {
                 for (var j = 0; j < scrabblefeld[i].length; j++) {
                     feld.push(parseInt("" + scrabblefeld[i].charAt(j)));
