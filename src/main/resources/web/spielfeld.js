@@ -228,10 +228,10 @@ $(document).ready(function() {
                     brettpunkte[nr] = parseInt(message.punkte);
                     negativpunkte += parseInt(message.punkte);
                 } else {
-                    brettpunkte[nr]=0;
+                    brettpunkte[nr] = 0;
                 }
                 //punkte[nr]-=parseInt(message.punkte);
-                 // das bekommt der sieger dazu
+                // das bekommt der sieger dazu
                 if (brettpunkte.length === spieler.length) { // alle punkte beisammen
 
                     $("#nachricht").html("Das Spiel ist beendet!<p>");
@@ -245,11 +245,11 @@ $(document).ready(function() {
                     for (var i = 0; i < spieler.length; i++) {
                         if (sieger === i) {
 
-                            $("#nachricht").append("Spieler " + (i + 1) + ": " + punkte[i] + "+" + negativpunkte + "="+(punkte[i] + negativpunkte) + "<br>");
-                            eb.send("scrabble.spieler."+spieler[i],{typ:"ende",punkte:punkte[i]+negativpunkte,sieger:true});
+                            $("#nachricht").append("Spieler " + (i + 1) + ": " + punkte[i] + "+" + negativpunkte + "=" + (punkte[i] + negativpunkte) + "<br>");
+                            eb.send("scrabble.spieler." + spieler[i], {typ: "ende", punkte: punkte[i] + negativpunkte, sieger: true});
                         } else {
-                            $("#nachricht").append("Spieler " + (i + 1) + ": " +punkte[i]+"-"+brettpunkte[i]+"="+ (punkte[i] - brettpunkte[i]) + "<br>");
-                            eb.send("scrabble.spieler."+spieler[i],{typ:"ende",punkte:punkte[i]-brettpunkte[i],sieger:false});
+                            $("#nachricht").append("Spieler " + (i + 1) + ": " + punkte[i] + "-" + brettpunkte[i] + "=" + (punkte[i] - brettpunkte[i]) + "<br>");
+                            eb.send("scrabble.spieler." + spieler[i], {typ: "ende", punkte: punkte[i] - brettpunkte[i], sieger: false});
                         }
                     }
                 }
@@ -263,7 +263,7 @@ $(document).ready(function() {
             spielende = false;
             passzaehler = 0;
 
-        
+
 
             for (var i = 0; i < aktuelleswort.length; i++) {
                 if (aktuelleswort[i] !== "?") {
@@ -280,7 +280,7 @@ $(document).ready(function() {
                     x++;
                 }
             }
-            
+
             punkte[geradedran] += aktuellesDelta;
             if (alle === true && oben > 0) {
                 punkte[geradedran] += 50;
@@ -288,9 +288,9 @@ $(document).ready(function() {
                 spielende = true;
                 sieger = geradedran;
             }
-            
-            
-            
+
+
+
             renderFeld();
             var bs = zieheBuchstaben(zaehler);
             var feld2 = [];
@@ -301,7 +301,7 @@ $(document).ready(function() {
                 }
             }
 
-            
+
 
             if (spielende === false) {
                 eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistnichtdran", wert: feld2, punkte: punkte[geradedran]});
@@ -422,55 +422,55 @@ $(document).ready(function() {
                     }
                 }
 
-            
-            
-            // noch schnell die umgebung des wortes testen
-            var leerzaehler=0;
-            for (var i=0;i<aktuelleswort.length;i++){
-                if (aktuelleswort[i]==="?"){
-                    leerzaehler++;
-                }
-            }
-            
-            var zaehler=0;
-            if (leerzaehler===0&&gesamtergebnis.length===2&&gesamtergebnis[0].length===aktuelleswort.length){ // dann schauen, ob neues wort größer als altes
-                if (gedreht===false){
-                    // hier schauen, ob links oder rechts noch etwas steht
-                    if (aktuellesX-1>=0){
-                        if (belegung[(aktuellesY*15+aktuellesX-1)]!==" "){
-                            zaehler++;
-                        }
-                    }
-                    if (aktuellesX+aktuelleswort.length<15){
-                        if (belegung[aktuellesY*15+aktuellesX+aktuelleswort.length]!==" ")
-                            zaehler++;
-                    }
-                } else {
-                    // hier schauen, ob oben oder unten noch etwas steht
-                    if (aktuellesY-1>=0){
-                        if (belegung[(aktuellesY-1)*15+aktuellesX]!==" "){
-                            zaehler++;
-                        }
-                    }
-                    if (aktuellesY+aktuelleswort.length<15){
-                        if (belegung[(aktuellesY+aktuelleswort.length)*15+aktuellesX]!==" "){
-                            zaehler++;
-                        }
+
+
+                // noch schnell die umgebung des wortes testen
+                var leerzaehler = 0;
+                for (var i = 0; i < aktuelleswort.length; i++) {
+                    if (aktuelleswort[i] === "?") {
+                        leerzaehler++;
                     }
                 }
-                if (zug>0&& zaehler===0){
-                buchstabensumme=0;
+
+                var zaehler = 0;
+                if (leerzaehler === 0 && gesamtergebnis.length === 2 && gesamtergebnis[0].length === aktuelleswort.length) { // dann schauen, ob neues wort größer als altes
+                    if (gedreht === false) {
+                        // hier schauen, ob links oder rechts noch etwas steht
+                        if (aktuellesX - 1 >= 0) {
+                            if (belegung[(aktuellesY * 15 + aktuellesX - 1)] !== " ") {
+                                zaehler++;
+                            }
+                        }
+                        if (aktuellesX + aktuelleswort.length < 15) {
+                            if (belegung[aktuellesY * 15 + aktuellesX + aktuelleswort.length] !== " ")
+                                zaehler++;
+                        }
+                    } else {
+                        // hier schauen, ob oben oder unten noch etwas steht
+                        if (aktuellesY - 1 >= 0) {
+                            if (belegung[(aktuellesY - 1) * 15 + aktuellesX] !== " ") {
+                                zaehler++;
+                            }
+                        }
+                        if (aktuellesY + aktuelleswort.length < 15) {
+                            if (belegung[(aktuellesY + aktuelleswort.length) * 15 + aktuellesX] !== " ") {
+                                zaehler++;
+                            }
+                        }
+                    }
+                    if (zug > 0 && zaehler === 0) {
+                        buchstabensumme = 0;
+                    }
+                }
+
+                if (gesamtergebnis.length === 0) {
+                    buchstabensumme = 0;
+                }
+
+                if (zug === 0 && zaehlerzentrum === 0) {
+                    buchstabensumme = 0;
+                }
             }
-            }
-            
-            if (gesamtergebnis.length===0){
-                buchstabensumme=0;
-            }
-            
-            if (zug === 0 && zaehlerzentrum === 0) {
-                buchstabensumme = 0;
-            }
-        }
             return [wort, buchstabensumme, gesamtergebnis];
         }
 
