@@ -140,7 +140,7 @@ $(document).ready(function() {
                     } else {
                         // nochmal
 
-                        eb.send("scrabble.alle", {typ: "weiter"});
+                        eb.publish("scrabble.alle", {typ: "weiter"});
                         eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
                         renderFeld();
                         $("#nachricht").html("Das Wort von Spieler " + (geradedran + 1) + " wurde gerade mit " + neinstimmen + " zu " + jastimmen + " Stimmen abgelehnt!<p>Nochmal!")
@@ -155,7 +155,7 @@ $(document).ready(function() {
                         macheweiter();
                     } else {
                         // nochmal
-                        eb.send("scrabble.alle", {typ: "weiter"});
+                        eb.publish("scrabble.alle", {typ: "weiter"});
                         eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
                         renderFeld();
                         $("#nachricht").html("Das Wort von Spieler " + (geradedran + 1) + " wurde gerade mit " + neinstimmen + " zu " + jastimmen + " Stimmen abgelehnt!<p>Nochmal!")
@@ -177,7 +177,7 @@ $(document).ready(function() {
                     geradedran = (geradedran + 1) % spieler.length;
                     eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
 
-                    eb.send("scrabble.alle", {typ: "weiter"});
+                    eb.publish("scrabble.alle", {typ: "weiter"});
 
                     renderFeld();
 
@@ -211,7 +211,7 @@ $(document).ready(function() {
                 geradedran = (geradedran + 1) % spieler.length;
                 eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
 
-                eb.send("scrabble.alle", {typ: "weiter"});
+                eb.publish("scrabble.alle", {typ: "weiter"});
                 //zug++;
                 renderFeld();
                 $("#nachricht").html(nachrichtentext + "Spieler " + (geradedran + 1) + " ist am Zug!");
@@ -312,7 +312,7 @@ $(document).ready(function() {
                 geradedran = (geradedran + 1) % spieler.length;
                 eb.send("scrabble.spieler." + spieler[geradedran], {typ: "bistdran"});
 
-                eb.send("scrabble.alle", {typ: "weiter"});
+                eb.publish("scrabble.alle", {typ: "weiter"});
                 zug++;
                 renderFeld();
 
