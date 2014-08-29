@@ -4,6 +4,11 @@ $(document).ready(function() {
     var buchstabenhaeufigkeiten = [5, 1, 2, 2, 4, 15, 2, 3, 4, 6, 1, 2, 3, 4, 9, 3, 1, 1, 1, 6, 7, 6, 6, 1, 1, 1, 1, 1, 1, 2];
     var buchstaben = ["A", "Ä", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "Ö", "P", "Q", "R", "S", "T", "U", "Ü", "V", "W", "X", "Y", "Z", "_"];
     //0 normal, 1 start, 2 doppelter bs, 3 dreifacher bs, 4 doppeltes w, 5 dreifaches w
+    
+    var uebersicht="";
+    for (var i=0;i<buchstaben.length;i++){
+        uebersicht+=buchstabenhaeufigkeiten[i]+buchstaben[i]+buchstabenwerte[i]+" ";
+    }
     var scrabblefeld = [];
     var punkte = [];
     var ueberpruefung = false;
@@ -43,7 +48,7 @@ $(document).ready(function() {
     var fb = breite / 15; // feldbreite
     var schriftgroesse = fb / 2;
     $("body").html("");
-    $("body").append("<table><tr><td><canvas id='bild' width='" + breite + "px' height='" + breite + "px'/></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Alle Spieler bitte anmelden!</div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div></div></td></tr></table>");
+    $("body").append("<table><tr><td><canvas id='bild' width='" + breite + "px' height='" + breite + "px'/></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Alle Spieler bitte anmelden!</div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div><div id='uebersicht'>"+uebersicht+"</div></div></td></tr></table>");
 
     //$("body").append("<div class='aktuell' id='aktuell'/><div class='punkte' id='punkte'/><div class='info' id='nachricht'/>");
     c = $("#bild")[0].getContext("2d");
