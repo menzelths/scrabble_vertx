@@ -59,3 +59,12 @@ table{
     font-family: "Arial";
        
 }
+.farbig3{
+    margin: 20px;
+    padding: 20px;
+    border: 20px;
+    background-color: #ffaaaa;
+    font-family: "Arial";
+    font-size:60%;
+       
+}

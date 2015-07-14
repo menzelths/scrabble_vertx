@@ -7,10 +7,11 @@ $(document).ready(function() {
     
     var uebersicht="";
     for (var i=0;i<buchstaben.length;i++){
-        uebersicht+=buchstabenhaeufigkeiten[i]+buchstaben[i]+buchstabenwerte[i]+" ";
+        uebersicht+=buchstabenhaeufigkeiten[i]+"_"+buchstaben[i]+buchstabenwerte[i]+"<br>";
     }
     var scrabblefeld = [];
     var punkte = [];
+    var rot;
     var ueberpruefung = false;
     var negativpunkte = 0;
     var aktuellesDelta = 0;
@@ -21,6 +22,7 @@ $(document).ready(function() {
     var brettpunkte = [];
     var spielende = false;
     var siegernr = -1;
+    var zeichnerot=false;
     var alle = false; // ob der aktuelle spieler alle steine benutzt hat (dann 50 punkte zusätzlich)
     var tempfeld = []; // feld zur überprüfung der summe
     var farben = ["#ffffff", "#ffaaaa", "#A9E2F3", "#58ACFA", "#ffff00", "#FF8000"];
@@ -38,6 +40,7 @@ $(document).ready(function() {
     var c = null; // graphischer kontext
     var gedreht = false;
     var feld = []; // spielfeldwerte
+    var rotfeld = []; //  rotwerte
     var belegung = [];
     var buchstabenTopf = [];
     var blanko = 2;
@@ -48,10 +51,19 @@ $(document).ready(function() {
     var fb = breite / 15; // feldbreite
     var schriftgroesse = fb / 2;
     $("body").html("");
-    $("body").append("<table><tr><td><canvas id='bild' width='" + breite + "px' height='" + breite + "px'/></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Alle Spieler bitte anmelden!</div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div><div id='uebersicht'>"+uebersicht+"</div></div></td></tr></table>");
+    $("body").append("<table><tr><td><div id='qrcode'></div></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Alle Spieler bitte anmelden auf <p><b>"+location.href+"spieler.html</b><p></div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div></div></td><td><div id='uebersicht'> </div></td></tr></table>");
 
     //$("body").append("<div class='aktuell' id='aktuell'/><div class='punkte' id='punkte'/><div class='info' id='nachricht'/>");
-    c = $("#bild")[0].getContext("2d");
+    new QRCode(document.getElementById("qrcode"), 
+    {
+    text: location.href+"spieler.html",
+    width: breite*2/3,
+    height: breite*2/3,
+    colorDark : "#000000",
+    colorLight : "#ffffff",
+    correctLevel : QRCode.CorrectLevel.H
+});
+    //c = $("#bild")[0].getContext("2d");
     var eb = new vertx.EventBus('/bridge');
     var spielernummer = 0;
     var spieler = [];
@@ -84,6 +96,8 @@ $(document).ready(function() {
                 var wort = message.wort;
                 alle = message.alle;
                 gedreht = false;
+                rot=message.rot;
+                
                 for (var i = 0; i < spieler.length; i++) {
                     if (spieler[i] === uuid && i === geradedran) {
                         aktuelleswort = wort;
@@ -91,6 +105,9 @@ $(document).ready(function() {
                         zeichneAktuellesWort(7, 7, false);
                     }
                 }
+            } else if (typ==="zeichnerot"){
+                zeichnerot=true;
+                renderFeld();
             } else if (typ === "schieben") {
                 var uuid = message.nr;
                 var dx = parseInt(message.dx);
@@ -136,6 +153,7 @@ $(document).ready(function() {
                 }
             } else if (typ === "ja") { // wörter stimmen
                 jastimmen++;
+                
                 if (neinstimmen + jastimmen === spieler.length - 1) {
                     if (jastimmen > (spieler.length - 1) / 2.0) { // nächster spieler
                         //eb.send("scrabble.spieler."+spieler[geradedran],{typ:"bistnichtdran"});
@@ -273,6 +291,9 @@ $(document).ready(function() {
             for (var i = 0; i < aktuelleswort.length; i++) {
                 if (aktuelleswort[i] !== "?") {
                     belegung[y * 15 + x] = aktuelleswort[i];
+                    if (rot===true){
+                        rotfeld[y*15+x]=1; // farbigen teil markieren
+                    }
                     if (feld[y * 15 + x] > 0) {
                         feld[y * 15 + x] *= -1; // prämienpunkte annulieren
                     }
@@ -285,7 +306,7 @@ $(document).ready(function() {
                     x++;
                 }
             }
-
+            rot=false;
             punkte[geradedran] += aktuellesDelta;
             if (alle === true && oben > 0) {
                 punkte[geradedran] += 50;
@@ -360,16 +381,20 @@ $(document).ready(function() {
                     // aktuelles wort nehmen
                     wort += aktuelleswort[i];
                     for (var j = 0; j < buchstaben.length; j++) {
+                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
                         if (buchstaben[j] === aktuelleswort[i]) {
                             buchstabensumme += buchstabenwerte[j] * faktor;
                         }
                     }
+                    }
                 } else if (belegung[y * 15 + x] !== " " && aktuelleswort[i] === "?") {
                     wort += belegung[y * 15 + x];
                     for (var j = 0; j < buchstaben.length; j++) {
+                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
                         if (buchstaben[j] === belegung[y * 15 + x]) {
                             buchstabensumme += buchstabenwerte[j] * faktor;
                         }
+                    }
                     }
                 } else {
                     faktorwort = 0; // ungültiges wort
@@ -510,25 +535,29 @@ $(document).ready(function() {
                 }
 
                 var b = tempfeld[y * 15 + x];
-                var t1 = x == altx;
-                var t2 = y == alty;
+                var t1 = x === altx;
+                var t2 = y === alty;
                 var t3 = x < 15;
                 var t4 = y < 15;
                 if (b !== " " && !(t1 && t2) && t3 && t4) {
                     wort += tempfeld[y * 15 + x];
                     for (var j = 0; j < buchstaben.length; j++) {
+                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
                         if (buchstaben[j] === tempfeld[y * 15 + x]) {
                             buchstabensumme += buchstabenwerte[j] * faktor;
                         }
+                    }
                     }
 
 
                 } else if (x === altx && y === alty) {
                     wort += bs;
                     for (var j = 0; j < buchstaben.length; j++) {
+                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
                         if (buchstaben[j] === bs) {
                             buchstabensumme += buchstabenwerte[j] * faktor;
                         }
+                    }
                     }
                 } else {
                     weiter = false;
@@ -568,7 +597,8 @@ $(document).ready(function() {
                 c.font = "bold " + schriftgroesse + "px Arial";
                 c.textAlign = "center";
                 c.fillStyle = "#ff0000";
-                var text = "" + aktuelleswort[i];
+                var text = "" + aktuelleswort[i].toUpperCase();
+                
                 if (text !== "?") {
                     c.fillStyle = "#008800";
                     if (belegung[yzaehler * 15 + xzaehler] !== " ") {
@@ -601,7 +631,7 @@ $(document).ready(function() {
                     var summe = 0;
                     var liste = [];
                     for (var i = 0; i < ergebnis.length; i += 2) {
-                        $("#nachricht").append("Wort: " + ergebnis[i] + ", Wert: " + ergebnis[i + 1] + "<br>");
+                        $("#nachricht").append("Wort: " + ergebnis[i].toUpperCase() + ", Wert: " + ergebnis[i + 1] + "<br>");
                         summe += ergebnis[i + 1];
                         liste.push(ergebnis[i]);
                     }
@@ -668,6 +698,7 @@ $(document).ready(function() {
                     } else {
                         belegung.push(buchstaben[parseInt(Math.random() * buchstaben.length)]);
                     }
+                    rotfeld.push(0); // farbe überall auf 0 setzen
                 }
             }
         }
@@ -699,6 +730,18 @@ $(document).ready(function() {
                 c.textAlign = "center";
                 c.fillStyle = "#000000";
                 var text = "" + belegung[i];
+                if (text.toUpperCase()!==text){ // kleinbuchstabe = joker
+                    c.fillStyle="#ff0000";
+                    c.fillRect((i % 15) * fb , parseInt(i / 15) * fb, fb , fb );
+                    c.fillStyle="#ffffff";
+                    c.fillRect((i % 15) * fb +5, parseInt(i / 15) * fb+5, fb - 10, fb - 10);
+                    c.fillStyle="#000000";
+                    text=text.toUpperCase();
+                }
+                var farbe= rotfeld[i];
+                if (farbe>0&&zeichnerot===true){
+                    c.fillStyle="#ff0000";
+                }
                 if (text !== "?") {
                     c.fillText(text, (i % 15) * fb + 4 + (fb - 8) / 2, parseInt(i / 15) * fb + schriftgroesse * 1.3);
                 }
@@ -732,6 +775,11 @@ $(document).ready(function() {
             var zufall = parseInt(Math.random() * spieler.length);
             geradedran = zufall;
             eb.send("scrabble.spieler." + spieler[zufall], {typ: "bistdran"});
+            $("#qrcode").html("<canvas id='bild' width='" + breite + "px' height='" + breite + "px'/>");
+            $("#uebersicht").html(uebersicht).addClass("farbig3");
+            
+            c=$("#bild")[0].getContext("2d");
+          
             initialisiereFeld();
             renderFeld();
             $("#nachricht").html("Los geht's!<p>Es beginnt Spieler " + (geradedran + 1));

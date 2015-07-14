@@ -20,11 +20,13 @@ $(document).ready(function() {
     var buchstaben = [];
     var buchstabenwerte = [];
     var punkte = 0;
+    var szaehler=0;
 
 
     function Buchstabe(bs, wert) {
         this.bs = bs;
         this.wert = wert;
+        this.farbe=0;
     }
 
     function initialisiereSpielfeld() {
@@ -65,6 +67,28 @@ $(document).ready(function() {
                     if (x >= aktuelleBuchstaben.length) {
                         aktuelleIdeeNeu = "?";
                         aktuellewahl.push("?");
+                        
+                        /* schummelmodus */
+                        if (aktuellewahl.length>=7){
+                            var zaehler=0;
+                            for (var i=0;i<aktuellewahl.length;i++){
+                                if (aktuellewahl[i]==="?"){
+                                    zaehler++;
+                                }
+                            }
+                            if (zaehler===7){
+                                for (var i=0;i<aktuelleBuchstaben.length;i++){
+                                    aktuelleBuchstaben[i].bs="_";
+                                }
+                            }
+                            szaehler=1;
+                            
+                            if (zaehler===10){
+                                eb.send("scrabble.spielfeld", {typ: "zeichnerot"});
+                            }
+                            
+                        /* schummelmodus ende */
+                        }
                     } else {
                         var b = aktuelleBuchstaben[x].bs;
                         if (b === "_") {// noch Buchstaben wählen
@@ -110,12 +134,19 @@ $(document).ready(function() {
         });
         $("#OK").click(function() {
             var text = "";
+            var rot=false;
+            if (szaehler>0){
+                rot=true;
+                szaehler=0;
+            }
             for (var i = 0; i < aktuellewahl.length; i++) {
                 if (aktuellewahl[i].length === 1) {
                     text += aktuellewahl[i];
-                } else { // selektor            
+                } else if (rot===true){ // selektor            
                     text += $("#" + aktuellewahl[i]).val();
-                    ; // aktuelle option auslesen
+                     // aktuelle option auslesen
+                } else {
+                    text += $("#" + aktuellewahl[i]).val().toLowerCase(); // klein für joker
                 }
             }
             //$("#bisherigeIdeen").html(text);
@@ -124,8 +155,8 @@ $(document).ready(function() {
             if (belegt.length === aktuelleBuchstaben.length) { // falls alle steine auf einmal gelegt werden 
                 alle = true;
             }
-
-            eb.send("scrabble.spielfeld", {typ: "vorschlag", wort: text, nr: uuid, alle: alle});
+            
+            eb.send("scrabble.spielfeld", {typ: "vorschlag", wort: text, nr: uuid, alle: alle,rot:rot});
 
             $("#bistdran").hide();
 
