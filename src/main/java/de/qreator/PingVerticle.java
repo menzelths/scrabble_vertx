@@ -14,7 +14,7 @@ public class PingVerticle {
     public static void main(String[] s) {
         int port = 8080;
         if (s.length == 1) {
-            port = Integer.parseInt(s[0]); // betriebsmodus festlegen: 
+            port = Integer.parseInt(s[0]); // port festlegen: 
 
         }
 
@@ -27,7 +27,7 @@ public class PingVerticle {
         inboundPermitted[0] = new PermittedOptions().setAddress("scrabble.alle");
         inboundPermitted[1] = new PermittedOptions().setAddress("scrabble.spielfeld");
         inboundPermitted[2] = new PermittedOptions().setAddressRegex("scrabble.spieler\\..+");
-        //PermittedOptions outboundPermitted = new PermittedOptions().setAddress("de.qreator.led");
+        
         BridgeOptions options = new BridgeOptions();
         for (int i = 0; i < 3; i++) {
             options.addInboundPermitted(inboundPermitted[i]);
