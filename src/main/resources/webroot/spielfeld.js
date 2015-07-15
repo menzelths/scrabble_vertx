@@ -1,13 +1,13 @@
-$(document).ready(function() {
+$(document).ready(function () {
     var zeilen = 15;
     var buchstabenwerte = [1, 6, 3, 4, 1, 1, 4, 2, 2, 1, 6, 4, 2, 3, 1, 2, 8, 4, 10, 1, 1, 1, 1, 6, 6, 3, 8, 10, 3, 0];
     var buchstabenhaeufigkeiten = [5, 1, 2, 2, 4, 15, 2, 3, 4, 6, 1, 2, 3, 4, 9, 3, 1, 1, 1, 6, 7, 6, 6, 1, 1, 1, 1, 1, 1, 2];
     var buchstaben = ["A", "Ä", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "Ö", "P", "Q", "R", "S", "T", "U", "Ü", "V", "W", "X", "Y", "Z", "_"];
     //0 normal, 1 start, 2 doppelter bs, 3 dreifacher bs, 4 doppeltes w, 5 dreifaches w
-    
-    var uebersicht="";
-    for (var i=0;i<buchstaben.length;i++){
-        uebersicht+=buchstabenhaeufigkeiten[i]+"_"+buchstaben[i]+buchstabenwerte[i]+"<br>";
+
+    var uebersicht = "";
+    for (var i = 0; i < buchstaben.length; i++) {
+        uebersicht += buchstabenhaeufigkeiten[i] + "_" + buchstaben[i] + buchstabenwerte[i] + "<br>";
     }
     var scrabblefeld = [];
     var punkte = [];
@@ -22,7 +22,7 @@ $(document).ready(function() {
     var brettpunkte = [];
     var spielende = false;
     var siegernr = -1;
-    var zeichnerot=false;
+    var zeichnerot = false;
     var alle = false; // ob der aktuelle spieler alle steine benutzt hat (dann 50 punkte zusätzlich)
     var tempfeld = []; // feld zur überprüfung der summe
     var farben = ["#ffffff", "#ffaaaa", "#A9E2F3", "#58ACFA", "#ffff00", "#FF8000"];
@@ -51,18 +51,18 @@ $(document).ready(function() {
     var fb = breite / 15; // feldbreite
     var schriftgroesse = fb / 2;
     $("body").html("");
-    $("body").append("<table><tr><td><div id='qrcode'></div></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Alle Spieler bitte anmelden auf <p><b>"+location.href+"spieler.html</b><p></div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div></div></td><td><div id='uebersicht'> </div></td></tr></table>");
+    $("body").append("<table><tr><td><div id='qrcode'></div></td><td valign='top'><div class='farbig'> <div class='aktuell' id='aktuell'>Alle Spieler bitte anmelden auf <p><b>" + location.href + "spieler.html</b><p></div><div class='punkte' id='punkte'>Wenn alle Spieler angemeldet sind, kann Spieler 1 das Spiel starten.</div></div><p><div class='farbig2'><div class='info' id='nachricht'>Noch kein Spieler angemeldet!</div></div></td><td><div id='uebersicht'> </div></td></tr></table>");
 
     //$("body").append("<div class='aktuell' id='aktuell'/><div class='punkte' id='punkte'/><div class='info' id='nachricht'/>");
-    new QRCode(document.getElementById("qrcode"), 
-    {
-    text: location.href+"spieler.html",
-    width: breite*2/3,
-    height: breite*2/3,
-    colorDark : "#000000",
-    colorLight : "#ffffff",
-    correctLevel : QRCode.CorrectLevel.H
-});
+    new QRCode(document.getElementById("qrcode"),
+            {
+                text: location.href + "spieler.html",
+                width: breite * 2 / 3,
+                height: breite * 2 / 3,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
     //c = $("#bild")[0].getContext("2d");
     var eb = new vertx.EventBus('/bridge');
     var spielernummer = 0;
@@ -70,9 +70,9 @@ $(document).ready(function() {
     var anmeldung = true;
     var geradedran = 0;
     var aktuelleswort = "";
-    eb.onopen = function() {
+    eb.onopen = function () {
 
-        eb.registerHandler('scrabble.spielfeld', function(message, replier) {
+        eb.registerHandler('scrabble.spielfeld', function (message, replier) {
 
             var typ = message.typ;
             if (typ === "spielnr" && anmeldung === true) {
@@ -96,8 +96,8 @@ $(document).ready(function() {
                 var wort = message.wort;
                 alle = message.alle;
                 gedreht = false;
-                rot=message.rot;
-                
+                rot = message.rot;
+
                 for (var i = 0; i < spieler.length; i++) {
                     if (spieler[i] === uuid && i === geradedran) {
                         aktuelleswort = wort;
@@ -105,8 +105,8 @@ $(document).ready(function() {
                         zeichneAktuellesWort(7, 7, false);
                     }
                 }
-            } else if (typ==="zeichnerot"){
-                zeichnerot=true;
+            } else if (typ === "zeichnerot") {
+                zeichnerot = true;
                 renderFeld();
             } else if (typ === "schieben") {
                 var uuid = message.nr;
@@ -153,7 +153,7 @@ $(document).ready(function() {
                 }
             } else if (typ === "ja") { // wörter stimmen
                 jastimmen++;
-                
+
                 if (neinstimmen + jastimmen === spieler.length - 1) {
                     if (jastimmen > (spieler.length - 1) / 2.0) { // nächster spieler
                         //eb.send("scrabble.spieler."+spieler[geradedran],{typ:"bistnichtdran"});
@@ -291,8 +291,8 @@ $(document).ready(function() {
             for (var i = 0; i < aktuelleswort.length; i++) {
                 if (aktuelleswort[i] !== "?") {
                     belegung[y * 15 + x] = aktuelleswort[i];
-                    if (rot===true){
-                        rotfeld[y*15+x]=1; // farbigen teil markieren
+                    if (rot === true) {
+                        rotfeld[y * 15 + x] = 1; // farbigen teil markieren
                     }
                     if (feld[y * 15 + x] > 0) {
                         feld[y * 15 + x] *= -1; // prämienpunkte annulieren
@@ -306,7 +306,7 @@ $(document).ready(function() {
                     x++;
                 }
             }
-            rot=false;
+            rot = false;
             punkte[geradedran] += aktuellesDelta;
             if (alle === true && oben > 0) {
                 punkte[geradedran] += 50;
@@ -381,20 +381,20 @@ $(document).ready(function() {
                     // aktuelles wort nehmen
                     wort += aktuelleswort[i];
                     for (var j = 0; j < buchstaben.length; j++) {
-                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
-                        if (buchstaben[j] === aktuelleswort[i]) {
-                            buchstabensumme += buchstabenwerte[j] * faktor;
+                        if (buchstaben[j].toUpperCase() === buchstaben[j]) { // joker nicht zählen
+                            if (buchstaben[j] === aktuelleswort[i]) {
+                                buchstabensumme += buchstabenwerte[j] * faktor;
+                            }
                         }
-                    }
                     }
                 } else if (belegung[y * 15 + x] !== " " && aktuelleswort[i] === "?") {
                     wort += belegung[y * 15 + x];
                     for (var j = 0; j < buchstaben.length; j++) {
-                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
-                        if (buchstaben[j] === belegung[y * 15 + x]) {
-                            buchstabensumme += buchstabenwerte[j] * faktor;
+                        if (buchstaben[j].toUpperCase() === buchstaben[j]) { // joker nicht zählen
+                            if (buchstaben[j] === belegung[y * 15 + x]) {
+                                buchstabensumme += buchstabenwerte[j] * faktor;
+                            }
                         }
-                    }
                     }
                 } else {
                     faktorwort = 0; // ungültiges wort
@@ -542,22 +542,22 @@ $(document).ready(function() {
                 if (b !== " " && !(t1 && t2) && t3 && t4) {
                     wort += tempfeld[y * 15 + x];
                     for (var j = 0; j < buchstaben.length; j++) {
-                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
-                        if (buchstaben[j] === tempfeld[y * 15 + x]) {
-                            buchstabensumme += buchstabenwerte[j] * faktor;
+                        if (buchstaben[j].toUpperCase() === buchstaben[j]) { // joker nicht zählen
+                            if (buchstaben[j] === tempfeld[y * 15 + x]) {
+                                buchstabensumme += buchstabenwerte[j] * faktor;
+                            }
                         }
-                    }
                     }
 
 
                 } else if (x === altx && y === alty) {
                     wort += bs;
                     for (var j = 0; j < buchstaben.length; j++) {
-                        if (buchstaben[j].toUpperCase()===buchstaben[j]){ // joker nicht zählen
-                        if (buchstaben[j] === bs) {
-                            buchstabensumme += buchstabenwerte[j] * faktor;
+                        if (buchstaben[j].toUpperCase() === buchstaben[j]) { // joker nicht zählen
+                            if (buchstaben[j] === bs) {
+                                buchstabensumme += buchstabenwerte[j] * faktor;
+                            }
                         }
-                    }
                     }
                 } else {
                     weiter = false;
@@ -598,7 +598,7 @@ $(document).ready(function() {
                 c.textAlign = "center";
                 c.fillStyle = "#ff0000";
                 var text = "" + aktuelleswort[i].toUpperCase();
-                
+
                 if (text !== "?") {
                     c.fillStyle = "#008800";
                     if (belegung[yzaehler * 15 + xzaehler] !== " ") {
@@ -730,17 +730,17 @@ $(document).ready(function() {
                 c.textAlign = "center";
                 c.fillStyle = "#000000";
                 var text = "" + belegung[i];
-                if (text.toUpperCase()!==text){ // kleinbuchstabe = joker
-                    c.fillStyle="#ff0000";
-                    c.fillRect((i % 15) * fb , parseInt(i / 15) * fb, fb , fb );
-                    c.fillStyle="#ffffff";
-                    c.fillRect((i % 15) * fb +5, parseInt(i / 15) * fb+5, fb - 10, fb - 10);
-                    c.fillStyle="#000000";
-                    text=text.toUpperCase();
+                if (text.toUpperCase() !== text) { // kleinbuchstabe = joker
+                    c.fillStyle = "#ff0000";
+                    c.fillRect((i % 15) * fb, parseInt(i / 15) * fb, fb, fb);
+                    c.fillStyle = "#ffffff";
+                    c.fillRect((i % 15) * fb + 5, parseInt(i / 15) * fb + 5, fb - 10, fb - 10);
+                    c.fillStyle = "#000000";
+                    text = text.toUpperCase();
                 }
-                var farbe= rotfeld[i];
-                if (farbe>0&&zeichnerot===true){
-                    c.fillStyle="#ff0000";
+                var farbe = rotfeld[i];
+                if (farbe > 0 && zeichnerot === true) {
+                    c.fillStyle = "#ff0000";
                 }
                 if (text !== "?") {
                     c.fillText(text, (i % 15) * fb + 4 + (fb - 8) / 2, parseInt(i / 15) * fb + schriftgroesse * 1.3);
@@ -777,9 +777,9 @@ $(document).ready(function() {
             eb.send("scrabble.spieler." + spieler[zufall], {typ: "bistdran"});
             $("#qrcode").html("<canvas id='bild' width='" + breite + "px' height='" + breite + "px'/>");
             $("#uebersicht").html(uebersicht).addClass("farbig3");
-            
-            c=$("#bild")[0].getContext("2d");
-          
+
+            c = $("#bild")[0].getContext("2d");
+
             initialisiereFeld();
             renderFeld();
             $("#nachricht").html("Los geht's!<p>Es beginnt Spieler " + (geradedran + 1));

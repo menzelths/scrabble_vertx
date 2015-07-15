@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(document).ready(function () {
     $("body").html("Spieler!");
     $("body").append("<div id='nachricht'/>");
     var eb = new vertx.EventBus('/bridge');
@@ -20,13 +20,13 @@ $(document).ready(function() {
     var buchstaben = [];
     var buchstabenwerte = [];
     var punkte = 0;
-    var szaehler=0;
+    var szaehler = 0;
 
 
     function Buchstabe(bs, wert) {
         this.bs = bs;
         this.wert = wert;
-        this.farbe=0;
+        this.farbe = 0;
     }
 
     function initialisiereSpielfeld() {
@@ -48,7 +48,7 @@ $(document).ready(function() {
         }
         c = $("#bild")[0].getContext("2d");
 
-        $("#bild").mousedown(function(event) {
+        $("#bild").mousedown(function (event) {
             event.preventDefault();
             var jetzt = new Date().getTime();
             if (spiellaeuft === true && jetzt - letzter_klick > zeitdifferenz) { // notwendig für manche handys wegen doppelklick
@@ -67,27 +67,27 @@ $(document).ready(function() {
                     if (x >= aktuelleBuchstaben.length) {
                         aktuelleIdeeNeu = "?";
                         aktuellewahl.push("?");
-                        
+
                         /* schummelmodus */
-                        if (aktuellewahl.length>=7){
-                            var zaehler=0;
-                            for (var i=0;i<aktuellewahl.length;i++){
-                                if (aktuellewahl[i]==="?"){
+                        if (aktuellewahl.length >= 7) {
+                            var zaehler = 0;
+                            for (var i = 0; i < aktuellewahl.length; i++) {
+                                if (aktuellewahl[i] === "?") {
                                     zaehler++;
                                 }
                             }
-                            if (zaehler===7){
-                                for (var i=0;i<aktuelleBuchstaben.length;i++){
-                                    aktuelleBuchstaben[i].bs="_";
+                            if (zaehler === 7) {
+                                for (var i = 0; i < aktuelleBuchstaben.length; i++) {
+                                    aktuelleBuchstaben[i].bs = "_";
                                 }
                             }
-                            szaehler=1;
-                            
-                            if (zaehler===10){
+                            szaehler = 1;
+
+                            if (zaehler === 10) {
                                 eb.send("scrabble.spielfeld", {typ: "zeichnerot"});
                             }
-                            
-                        /* schummelmodus ende */
+
+                            /* schummelmodus ende */
                         }
                     } else {
                         var b = aktuelleBuchstaben[x].bs;
@@ -116,7 +116,7 @@ $(document).ready(function() {
 
             }
         });
-        $("#loeschen").click(function() {
+        $("#loeschen").click(function () {
             aktuelleIdee = "";
             selektoren = [];
             aktuellewahl = [];
@@ -132,19 +132,19 @@ $(document).ready(function() {
                 $("#bistdran").hide();
             }
         });
-        $("#OK").click(function() {
+        $("#OK").click(function () {
             var text = "";
-            var rot=false;
-            if (szaehler>0){
-                rot=true;
-                szaehler=0;
+            var rot = false;
+            if (szaehler > 0) {
+                rot = true;
+                szaehler = 0;
             }
             for (var i = 0; i < aktuellewahl.length; i++) {
                 if (aktuellewahl[i].length === 1) {
                     text += aktuellewahl[i];
-                } else if (rot===true){ // selektor            
+                } else if (rot === true) { // selektor            
                     text += $("#" + aktuellewahl[i]).val();
-                     // aktuelle option auslesen
+                    // aktuelle option auslesen
                 } else {
                     text += $("#" + aktuellewahl[i]).val().toLowerCase(); // klein für joker
                 }
@@ -155,20 +155,20 @@ $(document).ready(function() {
             if (belegt.length === aktuelleBuchstaben.length) { // falls alle steine auf einmal gelegt werden 
                 alle = true;
             }
-            
-            eb.send("scrabble.spielfeld", {typ: "vorschlag", wort: text, nr: uuid, alle: alle,rot:rot});
+
+            eb.send("scrabble.spielfeld", {typ: "vorschlag", wort: text, nr: uuid, alle: alle, rot: rot});
 
             $("#bistdran").hide();
 
         });
-        $("#passen").click(function() { // zug aussetzen
-            eb.send("scrabble.spielfeld", {typ: "passen", nr: uuid}, function(antwort) {
+        $("#passen").click(function () { // zug aussetzen
+            eb.send("scrabble.spielfeld", {typ: "passen", nr: uuid}, function (antwort) {
             });
             belegt = [];
             aktuellewahl = [];
             zeichneSpielfeld();
         });
-        $("#tauschen").click(function() {
+        $("#tauschen").click(function () {
             var text = "";
             for (var i = 0; i < aktuellewahl.length; i++) {
                 if (aktuellewahl[i] !== "?") {
@@ -211,9 +211,9 @@ $(document).ready(function() {
 
     }
 
-    eb.onopen = function() {
+    eb.onopen = function () {
 
-        eb.registerHandler('scrabble.spieler.' + uuid, function(message, replier) { // eigene adresse
+        eb.registerHandler('scrabble.spieler.' + uuid, function (message, replier) { // eigene adresse
 
             var typ = message.typ;
             if (typ === "nr") {
@@ -221,7 +221,7 @@ $(document).ready(function() {
                 spielernummer = parseInt(message.wert);
                 if (spielernummer === 1) {
                     $("body").append("<br><input type='button' id='start' value='Starte das Spiel'></input>");
-                    $("#start").click(function() {
+                    $("#start").click(function () {
                         eb.send("scrabble.spielfeld", {typ: "start"});
                         //replier({typ:"start"});
                     });
@@ -281,15 +281,15 @@ $(document).ready(function() {
                 $("#navigation").append("<div class='wrapper'><span class='navi  schnellknopf' dy='3' dx='0'  >3 RUNTER</span></div><p>");
                 $("#navigation").append("<div class='wrapper'><span id='rotieren' class='knopf'  >DREHEN</span></div><p>");
                 $("#navigation").append("<span id='okwahl' class='knopf' >OK</span>");
-                $(".navi").click(function() {
+                $(".navi").click(function () {
 
 
                     eb.send("scrabble.spielfeld", {typ: "schieben", dx: $(this).attr("dx"), dy: $(this).attr("dy"), nr: uuid, drehen: false});
                 });
-                $("#rotieren").click(function() {
+                $("#rotieren").click(function () {
                     eb.send("scrabble.spielfeld", {typ: "schieben", dx: 0, dy: 0, nr: uuid, drehen: true});
                 });
-                $("#okwahl").click(function() {
+                $("#okwahl").click(function () {
                     eb.send("scrabble.spielfeld", {typ: "wort_ok", nr: uuid});
                 });
 
@@ -305,11 +305,11 @@ $(document).ready(function() {
                 }
                 $("body").append("<p><input type='button' value='JA' id='jaknopf'/><p>");
                 $("body").append("<p><input type='button' value='NEIN' id='neinknopf'/><p>");
-                $("#jaknopf").click(function() {
+                $("#jaknopf").click(function () {
                     eb.send("scrabble.spielfeld", {typ: "ja", nr: uuid});
                     zeichneSpielfeld();
                 });
-                $("#neinknopf").click(function() {
+                $("#neinknopf").click(function () {
                     eb.send("scrabble.spielfeld", {typ: "nein", nr: uuid});
                     zeichneSpielfeld();
                 });
@@ -333,7 +333,7 @@ $(document).ready(function() {
 
         });
 
-        eb.registerHandler('scrabble.alle', function(message, replier) { // nachricht von allen
+        eb.registerHandler('scrabble.alle', function (message, replier) { // nachricht von allen
             var typ = message.typ;
             if (typ === "anmeldung") {
                 $("#nachricht").html("Spieler Nummer " + message.wert + " wurde angemeldet");
