@@ -1,9 +1,16 @@
-# Vert.x Example Maven Project
+# Scrabble für mehrere Spieler
 
-Example project for creating a Vert.x module with a Gradle build.
+Zunächst den Spielserver starten mit
 
-By default this module contains a simple Java verticle which listens on the event bus and responds to `ping!`
-messages with `pong!`.
+```java
+java -jar scrabble-1.0-fat.jar 8080
+```
 
-This example also shows you how to write tests in Java, Groovy, Ruby and Python
+Dadurch wird der Server auf Port 8080 gestartet.
 
+Dann einen Browser auf der Seite des Spiels öffnen, z.B. http://localhost:8080 und den Anweisungen am Bildschirm folgen.
+
+Achtung: Sobald ein Browser auf eine andere Seite wechselt bzw. ein Gerät in den Standby-Modus geht, kann das Spiel nicht weitergespielt werden.
+
+
+Viel Spaß!
