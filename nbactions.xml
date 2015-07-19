@@ -19,7 +19,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath ${packageClassName}</exec.args>
+                <exec.args>-classpath %classpath de.qreator.PingVerticle</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>/Users/thomas/NetBeansProjects/git/scrabble</exec.workingdir>
             </properties>
